@@ -10,6 +10,14 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\CocktailMagician.Contracts\CocktailMagician.Contracts.csproj" />
+    <ProjectReference Include="..\CocktailMagician.Data\CocktailMagician.Data.csproj" />
+    <ProjectReference Include="..\CocktailMagician.Domain\CocktailMagician.Domain.csproj" />
   </ItemGroup>
 
 </Project>

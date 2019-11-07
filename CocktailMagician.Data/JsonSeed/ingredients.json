@@ -1,0 +1,75 @@
+[
+  {
+    "Id": 1,
+    "Name": "Coca-Cola"
+  },
+  {
+    "Id": 2,
+    "Name": "Coffee Liqueur"
+  },
+  {
+    "Id": 3,
+    "Name": "Lime Juice"
+  },
+  {
+    "Id": 4,
+    "Name": "Milk"
+  },
+  {
+    "Id": 5,
+    "Name": "Kahlua"
+  },
+  {
+    "Id": 6,
+    "Name": "White Rum"
+  },
+  {
+    "Id": 7,
+    "Name": "Whiskey"
+
+  },
+  {
+    "Id": 8,
+    "Name": "Vodka"
+  },
+  {
+    "Id": 9,
+    "Name": "Sprite"
+  },
+  {
+    "Id": 10,
+    "Name": "Orange Juice"
+  },
+  {
+    "Id": 11,
+    "Name": "Lemonade"
+  },
+  {
+    "Id": 12,
+    "Name": "Grenadine"
+  },
+  {
+    "Id": 13,
+    "Name": "Black Tea"
+  },
+  {
+    "Id": 14,
+    "Name": "Pineapple Juice"
+  },
+  {
+    "Id": 15,
+    "Name": "Pibb Xtra"
+  },
+  {
+    "Id": 16,
+    "Name": "Club Soda"
+  },
+  {
+    "Id": 17,
+    "Name": "Fanta"
+  },
+  {
+    "Id": 18,
+    "Name": "Yogurt"
+  }
+]

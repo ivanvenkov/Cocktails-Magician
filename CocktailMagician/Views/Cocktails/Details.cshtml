@@ -1,0 +1,14 @@
+﻿@model CocktailMagician.Contracts.Cocktail
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<ul>
+    <li>Bar Name: @Model.Name</li>
+    <li>Bar Address: @Model.Recipe</li>
+    <li>Rating: @Model.Rating</li>
+</ul>
+<h6><strong>Ingredients:</strong></h6> @string.Join(", ", Model.Ingredients.Select(x => x.Name))
+
