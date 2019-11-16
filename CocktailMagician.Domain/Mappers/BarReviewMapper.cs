@@ -22,7 +22,21 @@ namespace CocktailMagician.Domain.Mappers
                 Review = entity.Review
             };
         }
+        public static BarReviewEntity ToEntity(this BarReview contract)
+        {
+            if (contract == null)
+            {
+                return null;
+            }
 
+            return new BarReviewEntity
+            {
+                UserEntityId = contract.User?.Id,
+                BarEntityId = contract.Bar?.Id??0,
+                Rating = contract.Rating,
+                Review = contract.Review
+            };
+
+        }
     }
 }
-

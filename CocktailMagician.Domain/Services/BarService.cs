@@ -1,5 +1,6 @@
 ﻿using CocktailMagician.Contracts;
 using CocktailMagician.Data;
+using CocktailMagician.Data.Models;
 using CocktailMagician.Domain.Mappers;
 using CocktailMagician.Domain.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -28,15 +29,32 @@ namespace CocktailMagician.Domain.Services
             }
 
             var barEntity = bar.ToEntity();
+
             await this.context.Bars.AddAsync(barEntity);
             await this.context.SaveChangesAsync();
+            await AddCocktails(barEntity.Id, bar.Cocktails);
             return barEntity.ToContract();
         }
-        public async Task<Bar> Get(int id)
+
+        private async Task AddCocktails(int barId, IEnumerable<string> cocktails)
+        {
+            foreach (var item in cocktails)
+            {
+                var entity = new BarCocktailEntity
+                {
+                    BarEntityId = barId,
+                    CocktailEntityId = int.Parse(item)
+                };
+                this.context.BarCocktails.Add(entity);
+            }
+            await this.context.SaveChangesAsync();
+        }
+
+        public async Task<Bar> GetBar(int id)
         {
             var barEntity = await this.context.Bars
-                .Include(x=> x.BarCocktails)
-                .ThenInclude(x=> x.CocktailEntity)
+                .Include(x => x.BarCocktails)
+                .ThenInclude(x => x.CocktailEntity)
                 .SingleOrDefaultAsync(x => x.Id == id);
 
             if (barEntity == null)
@@ -60,12 +78,12 @@ namespace CocktailMagician.Domain.Services
             barEntity.IsHidden = bar.IsHidden;
             barEntity.ImagePath = bar.ImagePath;
             await this.context.SaveChangesAsync();
-
+            await AddCocktails(barEntity.Id, bar.Cocktails);
             return barEntity.ToContract();
         }
-        public async Task<Bar> Toggle(int Id) 
+        public async Task<Bar> Toggle(int id)
         {
-            var barEntity = await this.context.Bars.SingleOrDefaultAsync(x => x.Id == Id);
+            var barEntity = await this.context.Bars.SingleOrDefaultAsync(x => x.Id == id);
             if (barEntity == null)
             {
                 throw new ArgumentException("The requested Bar is null.");
@@ -76,11 +94,38 @@ namespace CocktailMagician.Domain.Services
             return barEntity.ToContract();
         }
 
-        public async Task<IEnumerable<Bar>> ListAll()
+        public async Task<IEnumerable<Bar>> ListAll(string role)
         {
-            var bars = await this.context.Bars.Select(x => x.ToContract()).ToListAsync();
+
+            var bars = await this.context.Bars
+                .Include(x => x.BarCocktails)
+                .ThenInclude(x => x.CocktailEntity)
+                               .Select(x => x.ToContract())
+                               .ToListAsync();
+
+            if (role != "Admin" || role == null)
+            {
+                return bars.Where(x => x.IsHidden == false);
+            }
+
             return bars;
         }
+        public async Task<IEnumerable<Cocktail>> ListCocktails()
+        {
+            var cocktails = await this.context.Cocktails
+                .Select(x => x.ToContract())
+                .ToListAsync();
 
+            return cocktails;
+        }
+
+        public async Task<double> CalculateAverageRating(Bar bar, int newRating)
+        {
+            var currentRatingsCount = await this.context.BarReviews.Where(x => x.BarEntityId == bar.Id).CountAsync();
+
+            var oldRating = bar.Rating ?? 0;
+            var newAverage = Math.Round(oldRating + (newRating - oldRating) / (currentRatingsCount + 1), 1);
+            return newAverage;
+        }
     }
 }
