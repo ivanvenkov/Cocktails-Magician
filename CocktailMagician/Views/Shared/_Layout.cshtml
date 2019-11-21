@@ -6,7 +6,7 @@
     <title>@ViewData["Title"] - CocktailMagician</title>
 
     <environment include="Development">
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-minty.css" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -22,6 +22,11 @@
 
 
     <link rel="stylesheet" href="~/css/site.css" />
+    @* css styling *@
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+      @* jquery *@
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>  
 </head>
 <body>
     <header>
@@ -49,13 +54,6 @@
                         </li>
                     </ul>
                 </div>
-                @*<div class="row text-right">
-                    <select name="theme" id="theme">
-                        <option value="0">Red</option>
-                        <option value="1">Green</option>
-                        <option value="2">Blue</option>
-                    </select>
-                </div>*@
             </div>
         </nav>
     </header>
@@ -93,5 +91,6 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @RenderSection("Scripts", required: false)
+    <partial name="_ValidationScriptsPartial" />
 </body>
 </html>

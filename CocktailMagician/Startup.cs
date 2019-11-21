@@ -1,6 +1,4 @@
-﻿using CocktailMagician.Data;
-using CocktailMagician.Data.Models;
-using CocktailMagician.Domain.Mappers;
+﻿using CocktailMagician.Data.Models;
 using CocktailMagician.Domain.Services;
 using CocktailMagician.Domain.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
