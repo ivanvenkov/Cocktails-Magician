@@ -2,39 +2,105 @@
 @{
     ViewData["Title"] = "Bars";
 }
-
-<h1>Bars</h1>
-
-@Html.ActionLink("New Bar", "Create", "Bars", null, new { @class = "btn btn-primary" })
-
 <div class="container">
-    @if (!Model.Any())
-    {
-        <p>We don't have any bars yet.</p>
-    }
-
-    <div class="row">
-        @foreach (var bar in Model)
+    <h1>Bars</h1>
+    <div class="container">
+        @if (User.IsInRole("Admin"))
         {
-            <partial name="_BarPartial" model="@bar" />
+            @Html.ActionLink("New Bar", "Create", "Bars", null, new { @class = "btn btn-primary" })
         }
+
+        @Html.ActionLink("Search", "Search", "Bars", null, new { @class = "btn btn-primary" })
     </div>
 </div>
 
-@if (ViewBag.Page > 0)
+<br>
+@if (!Model.Any())
 {
-    <a asp-controller="Bars" asp-action="Index" asp-route-id="@(ViewBag.Page-1)"
-       class="btn btn-default">
-        &laquo; Prev
-    </a>
-}
-@if (ViewBag.Page < ViewBag.MaxPage)
-{
-    <a asp-controller="Bars" asp-action="Index" asp-route-id="@(ViewBag.Page + 1)"
-       class="btn btn-default">
-        Next &raquo;
-    </a>
+    <p>We don't have any bars yet.</p>
 }
 
-<p>@(ViewBag.Page + 1)</p>
+<div class="row">
+    @foreach (var bar in Model)
+    {
+
+        <partial name="_BarPartial" model="@bar" />
+
+    }
+
+    <div class="container">
+        <br>
+        @if (ViewBag.Page > 0)
+        {
+            <a asp-controller="Bars" asp-action="Index" asp-route-id="@(ViewBag.Page-1)"
+               class="btn btn-primary">
+                &laquo; Prev
+            </a>
+            <a asp-controller="Bars" asp-action="Index" asp-route-id="@(ViewBag.Page-1)"
+               class="btn btn-light">
+                @(ViewBag.Page)
+            </a>
+        }
+        <a asp-controller="Bars" asp-action="Index" asp-route-id="@(ViewBag.Page)"
+           class="btn btn-primary">
+            @(ViewBag.Page + 1)
+        </a>
+        @if (ViewBag.Page < ViewBag.MaxPage)
+        {
+            <a asp-controller="Bars" asp-action="Index" asp-route-id="@(ViewBag.Page+1)"
+               class="btn btn-light">
+                @(ViewBag.Page + 2)
+            </a>
+            <a asp-controller="Bars" asp-action="Index" asp-route-id="@(ViewBag.Page + 1)"
+               class="btn btn-primary">
+                Next &raquo;
+            </a>
+        }
+
+    </div>
+</div>
+
 <br />
+
+<script>
+
+    const bars = $('.bar-container');
+    foreach(bar in bars);
+    {
+        const starsTotal = 5;
+
+        const barId = bar.attr('id');
+        const barRating = bar.attr('rating');
+
+        const starPercentage = (barRating / starsTotal) * 100;
+        //round to nearest 10
+        const starPercentageRounded = `${Math.round(starPercentage / 10) * 10}%`;
+
+        const pesho = document.querySelector(` .stars-inner`).style.width = starPercentageRounded // the stuff you calculated
+
+
+    }
+</script>
+
+
+
+@*-- partial
+    <div>
+        <div class="bar-container" id="@Model.id" raiting="@Model.raiting">
+        </div>
+    </div>
+
+    <script>
+        const bars = $(.bar - container`);
+        foreach (bar in bars) {
+            const barId = bar.attr('id');
+            const barRaiting = bar.attr('raiting'); //maybe it should have val() ?
+            ... calcution
+            const classToAjustWidth = $(`${ barId }.star - rating`).width = // the stuff you calculated
+        }*@
+
+
+
+
+
+

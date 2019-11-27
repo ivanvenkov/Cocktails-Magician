@@ -35,6 +35,87 @@ namespace CocktailMagician.Domain.Services
             return cocktailEntity.ToContract();
         }
 
+        public async Task<Cocktail> GetCocktail(int id)
+        {
+            var cocktailEntity = await this.context.Cocktails
+                .Include(x => x.CocktailIngredients)
+                .ThenInclude(x => x.IngredientEntity)
+                .SingleOrDefaultAsync(x => x.Id == id);
+
+            if (cocktailEntity == null)
+            {
+                throw new ArgumentException("There is no such cocktail in the database.");
+            }
+
+            this.context.Entry(cocktailEntity).State = EntityState.Detached;
+            foreach (var item in cocktailEntity.CocktailIngredients)
+            {
+                this.context.Entry(item).State = EntityState.Detached;
+            }
+
+            return cocktailEntity.ToContract();
+        }
+
+        public async Task<Cocktail> Update(CocktailUpdateRequest cocktail)
+        {
+            var existingCocktail = await GetCocktail(cocktail.Id);
+
+            var newCocktailEntity = cocktail.ToEntity(existingCocktail.ToEntity());
+
+            var existingIngredientsIds = existingCocktail.Ingredients.Select(x => x.Id);
+            var ingredientsIdsToRemove = existingIngredientsIds.Except(cocktail.IngredientIds);
+            var ingredientsIdsToAdd = cocktail.IngredientIds.Except(existingIngredientsIds);
+
+            AddIngredients(cocktail.Id, ingredientsIdsToAdd);
+            await IncrementIngredientCounter(ingredientsIdsToAdd);
+            RemoveIngredients(cocktail.Id, ingredientsIdsToRemove);
+            await DecrementIngredientCounter(ingredientsIdsToRemove);
+
+            this.context.Cocktails.Update(newCocktailEntity);
+
+            await this.context.SaveChangesAsync();
+            return await GetCocktail(cocktail.Id);
+        }
+
+        public async Task<Cocktail> Toggle(int id)
+        {
+            var cocktailEntity = await this.context.Cocktails.SingleOrDefaultAsync(x => x.Id == id);
+            if (cocktailEntity == null)
+            {
+                throw new ArgumentException("The requested cocktail is null.");
+            }
+            cocktailEntity.IsHidden = !cocktailEntity.IsHidden;
+
+            await this.context.SaveChangesAsync();
+
+            return cocktailEntity.ToContract();
+        }
+
+        public async Task<IEnumerable<Cocktail>> ListAll(string role)
+        {
+            var cocktails = await this.context.Cocktails
+               .Include(x => x.CocktailIngredients)
+                   .ThenInclude(x => x.IngredientEntity)
+               .Select(x => x.ToContract())
+               .ToListAsync();
+
+            if (role != "Admin" || role == null)
+            {
+                return cocktails.Where(x => x.IsHidden == false);
+            }
+
+            return cocktails;
+        }
+
+        public async Task<IEnumerable<Ingredient>> ListIngredients()
+        {
+            var ingredients = await this.context.Ingredients
+                .Select(x => x.ToContract())
+                .ToListAsync();
+
+            return ingredients;
+        }
+
         private void AddIngredients(int cocktailId, IEnumerable<int> ingredientIds)
         {
             foreach (var ingredientId in ingredientIds)
@@ -84,83 +165,6 @@ namespace CocktailMagician.Domain.Services
             await this.context.SaveChangesAsync();
         }
 
-        public async Task<Cocktail> GetCocktail(int id)
-        {
-            var cocktailEntity = await this.context.Cocktails
-                .Include(x => x.CocktailIngredients)
-                .ThenInclude(x => x.IngredientEntity)
-                .SingleOrDefaultAsync(x => x.Id == id);
-
-            if (cocktailEntity == null)
-            {
-                throw new ArgumentException("There is no such cocktail in the database.");
-            }
-
-            this.context.Entry(cocktailEntity).State = EntityState.Detached;
-            foreach (var item in cocktailEntity.CocktailIngredients)
-            {
-                this.context.Entry(item).State = EntityState.Detached;
-            }
-
-            return cocktailEntity.ToContract();
-        }
-
-        public async Task<Cocktail> Update(CocktailUpdateRequest cocktail)
-        {
-            var existingCocktail = await GetCocktail(cocktail.Id);
-
-            var newCocktailEntity = cocktail.ToEntity(existingCocktail.ToEntity());
-
-            var existingIngredientsIds = existingCocktail.Ingredients.Select(x => x.Id);
-            var ingredientsIdsToRemove = existingIngredientsIds.Except(cocktail.IngredientIds);
-            var ingredientsIdsToAdd = cocktail.IngredientIds.Except(existingIngredientsIds);
-
-            AddIngredients(cocktail.Id, ingredientsIdsToAdd);
-            await IncrementIngredientCounter(ingredientsIdsToAdd);
-            RemoveIngredients(cocktail.Id, ingredientsIdsToRemove);
-            await DecrementIngredientCounter(ingredientsIdsToRemove);
-
-            this.context.Cocktails.Update(newCocktailEntity);
-
-            await this.context.SaveChangesAsync();
-            return await GetCocktail(cocktail.Id);
-        }
-        public async Task<Cocktail> Toggle(int id)
-        {
-            var cocktailEntity = await this.context.Cocktails.SingleOrDefaultAsync(x => x.Id == id);
-            if (cocktailEntity == null)
-            {
-                throw new ArgumentException("The requested cocktail is null.");
-            }
-            cocktailEntity.IsHidden = !cocktailEntity.IsHidden;
-
-            await this.context.SaveChangesAsync();
-
-            return cocktailEntity.ToContract();
-        }
-        public async Task<IEnumerable<Cocktail>> ListAll(string role)
-        {
-            var cocktails = await this.context.Cocktails
-               .Include(x => x.CocktailIngredients)
-                   .ThenInclude(x => x.IngredientEntity)
-               .Select(x => x.ToContract())
-               .ToListAsync();
-
-            if (role != "Admin" || role == null)
-            {
-                return cocktails.Where(x => x.IsHidden == false);
-            }
-
-            return cocktails;
-        }
-        public async Task<IEnumerable<Ingredient>> ListIngredients()
-        {
-            var ingredients = await this.context.Ingredients
-                .Select(x => x.ToContract())
-                .ToListAsync();
-
-            return ingredients;
-        }
         public async Task<double> CalculateAverageRating(Cocktail cocktail, int newRating)
         {
             var currentRatingsCount = await this.context.CocktailReviews.Where(x => x.CocktailEntityId == cocktail.Id).CountAsync();
@@ -168,6 +172,80 @@ namespace CocktailMagician.Domain.Services
             var oldRating = cocktail.Rating ?? 0;
             var newAverage = Math.Round(oldRating + (newRating - oldRating) / (currentRatingsCount + 1), 1);
             return newAverage;
+        }
+
+        public async Task<ICollection<Cocktail>> GetTopRatedCoktails()
+        {
+            var topRatedCocktails = await this.context.Cocktails
+                .OrderByDescending(x => x.Rating)
+                .Take(3)
+                .Select(x => x.ToContract())
+                .ToListAsync();
+
+            return topRatedCocktails;
+        }
+
+        public async Task<ICollection<Cocktail>> SearchCocktailByName(string input)
+        {
+            List<Cocktail> output;
+            if (input == null)
+            {
+                output = await this.context.Cocktails.Select(x => x.ToContract()).ToListAsync();
+            }
+            else
+            {
+                output = await this.context.Cocktails
+                    .Select(x => x.ToContract())
+                    .Where(x => x.Name.Contains(input, StringComparison.OrdinalIgnoreCase))
+                    .ToListAsync();
+            }
+            return output;
+        }
+
+        public async Task<ICollection<Bar>> SearchCocktailByIngredient(string input)
+        {
+            //List<Cocktail> output;
+            //if (input == null)
+            //{
+            //    output = await this.context.Cocktails.Select(x => x.ToContract()).ToListAsync();
+            //}
+            //else
+            //{
+            //    output = await this.context.Cocktails
+            //        .Select(x => x.ToContract())
+            //        .Select(x => x.Ingredients).ForEachAsync(y=>y.Contains(input, StringComparison.OrdinalIgnoreCase))
+            //        .ToListAsync();
+            //}
+            //return output;
+            return new List<Bar>();
+        }
+
+        public async Task<ICollection<Bar>> SearchCocktailByBar(string input)
+        {
+            //List<Bar> output;
+            //if (input == null)
+            //{
+            //    output = await this.context.Bars.Select(x => x.ToContract()).ToListAsync();
+            //}
+            //else
+            //{
+            //    output = await this.context.Bars
+            //        .Select(x => x.ToContract())
+            //        .Where(x => x.Address.Contains(input, StringComparison.OrdinalIgnoreCase))
+            //        .ToListAsync();
+            //}
+            //return output;
+            return new List<Bar>();
+        }
+
+        Task<ICollection<Cocktail>> ICocktailService.SearchCocktailByIngredient(string input)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<ICollection<Cocktail>> ICocktailService.SearchCocktailByBar(string input)
+        {
+            throw new NotImplementedException();
         }
     }
 }

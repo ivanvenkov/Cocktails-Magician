@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
@@ -32,9 +33,7 @@ namespace CocktailMagician.Controllers
         public async Task<IActionResult> Index(int id)
         {
             var role = this.User.FindFirstValue(ClaimTypes.Role);
-
             const int PageSize = 3;
-
             var counter = await this.cocktailService.ListAll(role);
             var count = counter.Count();
 
@@ -74,8 +73,16 @@ namespace CocktailMagician.Controllers
                 return View(cocktail);
             }
 
+
             if (cocktail.Image != null)
             {
+                var (extension, isValid) = GetFileExtension(cocktail.Image.ContentType);
+
+                if (!isValid)
+                {
+                    TempData["ErrorMessage"] = "Invalid file type, please upload image!";
+                    return RedirectToAction("Create", "Bars");
+                }
                 string destinationFolder = Path.Combine(hostingEnvironment.WebRootPath, "images/cocktails");
                 string fileName = Guid.NewGuid().ToString() + "_" + cocktail.Image.FileName;
                 string imagePath = Path.Combine(destinationFolder, fileName);
@@ -86,6 +93,16 @@ namespace CocktailMagician.Controllers
             await this.cocktailService.Create(cocktail);
 
             return RedirectToAction("Index", "Cocktails");
+        }
+
+        private (string extension, bool isValid) GetFileExtension(string contentType)
+        {
+            if (contentType == "image/jpeg")
+                return (".jpg", true);
+            if (contentType == "image/png")
+                return (".png", true);
+
+            return (string.Empty, false);
         }
 
         [HttpGet]
@@ -143,6 +160,54 @@ namespace CocktailMagician.Controllers
         {
             var ingredients = await this.ingredientService.ListAll();
             return View(ingredients);
+        }
+
+        public async Task<IActionResult> GetTopRatedCocktails()
+        {
+            var topRatedList = await this.cocktailService.GetTopRatedCoktails();
+            var topRatedCocktailList = topRatedList.Select(x => new Cocktail());
+
+            return View(topRatedCocktailList);
+        }
+
+        [HttpGet]
+        public IActionResult Search()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Search(string input)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.View();
+            }
+            var result = await this.cocktailService.SearchCocktailByName(input);
+            var output = new CocktailSearchResult
+            {
+                Input = new List<Cocktail>(result)
+            };
+
+            return View(output);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SearchIngredient(string input)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                return this.View();
+            }
+            var result = await this.cocktailService.SearchCocktailByIngredient(input);
+            var output = new CocktailSearchResult
+            {
+                Input = new List<Cocktail>(result)
+            };
+
+            return View(output);
         }
     }
 }

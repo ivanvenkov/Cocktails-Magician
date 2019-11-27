@@ -36,38 +36,13 @@ namespace CocktailMagician.Domain.Services
             return barEntity.ToContract();
         }
 
-        private void AddCocktails(int barId, IEnumerable<int> cocktailIds)
-        {            
-            foreach (var cocktailId in cocktailIds)
-            {
-                var entity = new BarCocktailEntity
-                {
-                    BarEntityId = barId,
-                    CocktailEntityId = cocktailId
-                };
-                this.context.BarCocktails.Add(entity);
-            }         
-        }
-
-        private void RemoveCocktails(int barId, IEnumerable<int> cocktailIds)
-        {
-            foreach (var cocktailId in cocktailIds)
-            {
-                var entity = new BarCocktailEntity
-                {
-                    BarEntityId = barId,
-                    CocktailEntityId = cocktailId
-                };
-                this.context.BarCocktails.Remove(entity);
-            }
-        }
-
         public async Task<Bar> GetBar(int id)
         {
             var barEntity = await this.context.Bars
                 .Include(x => x.BarCocktails)
                 .ThenInclude(x => x.CocktailEntity)
                 .SingleOrDefaultAsync(x => x.Id == id);
+
             if (barEntity == null)
             {
                 throw new ArgumentException("There is no such bar in the database.");
@@ -103,7 +78,7 @@ namespace CocktailMagician.Domain.Services
             var barEntity = await this.context.Bars.SingleOrDefaultAsync(x => x.Id == id);
             if (barEntity == null)
             {
-                throw new ArgumentException("The requested Bar is null.");
+                throw new ArgumentException("There is no such bar.");
             }
             barEntity.IsHidden = !barEntity.IsHidden;
 
@@ -136,6 +111,32 @@ namespace CocktailMagician.Domain.Services
             return cocktails;
         }
 
+        private void AddCocktails(int barId, IEnumerable<int> cocktailIds)
+        {
+            foreach (var cocktailId in cocktailIds)
+            {
+                var entity = new BarCocktailEntity
+                {
+                    BarEntityId = barId,
+                    CocktailEntityId = cocktailId
+                };
+                this.context.BarCocktails.Add(entity);
+            }
+        }
+
+        private void RemoveCocktails(int barId, IEnumerable<int> cocktailIds)
+        {
+            foreach (var cocktailId in cocktailIds)
+            {
+                var entity = new BarCocktailEntity
+                {
+                    BarEntityId = barId,
+                    CocktailEntityId = cocktailId
+                };
+                this.context.BarCocktails.Remove(entity);
+            }
+        }
+
         public async Task<double> CalculateAverageRating(Bar bar, int newRating)
         {
             var currentRatingsCount = await this.context.BarReviews.Where(x => x.BarEntityId == bar.Id).CountAsync();
@@ -143,6 +144,51 @@ namespace CocktailMagician.Domain.Services
             var oldRating = bar.Rating ?? 0;
             var newAverage = Math.Round(oldRating + (newRating - oldRating) / (currentRatingsCount + 1), 1);
             return newAverage;
+        }
+
+        public async Task<ICollection<Bar>> GetTopRatedBars()
+        {
+            var topRatedBars = await this.context.Bars
+                .OrderByDescending(x => x.Rating)
+                .Take(3)
+                .Select(x => x.ToContract())
+                .ToListAsync();
+
+            return topRatedBars;
+        }
+
+        public async Task<ICollection<Bar>> SearchBarByName(string input)
+        {
+            List<Bar> output;
+            if (input == null)
+            {
+                output = await this.context.Bars.Select(x => x.ToContract()).ToListAsync();
+            }
+            else
+            {
+                output = await this.context.Bars
+                    .Select(x => x.ToContract())
+                    .Where(x => x.Name.Contains(input, StringComparison.OrdinalIgnoreCase))
+                    .ToListAsync();
+            }
+            return output;
+        }
+
+        public async Task<ICollection<Bar>> SearchBarAddress(string input)
+        {
+            List<Bar> output;
+            if (input == null)
+            {
+                output = await this.context.Bars.Select(x => x.ToContract()).ToListAsync();
+            }
+            else
+            {
+                output = await this.context.Bars
+                    .Select(x => x.ToContract())
+                    .Where(x => x.Address.Contains(input, StringComparison.OrdinalIgnoreCase))
+                    .ToListAsync();
+            }
+            return output;
         }
     }
 }
