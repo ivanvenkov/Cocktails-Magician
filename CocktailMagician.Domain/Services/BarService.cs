@@ -57,6 +57,17 @@ namespace CocktailMagician.Domain.Services
             return barEntity.ToContract();
         }
 
+        public async Task<IEnumerable<BarReview>> GetBarReviews(int barId)
+        {
+            var barReviews = await this.context.BarReviews
+                .Include(x => x.User)
+                .Where(x => x.BarEntityId == barId)
+                .Select(x => x.ToContract())
+                .ToListAsync();
+
+            return barReviews;
+        }
+
         public async Task<Bar> Update(BarUpdateRequest bar)
         {
             var existingBar = await GetBar(bar.Id);
@@ -102,6 +113,7 @@ namespace CocktailMagician.Domain.Services
 
             return bars;
         }
+
         public async Task<IEnumerable<Cocktail>> ListCocktails()
         {
             var cocktails = await this.context.Cocktails
@@ -150,6 +162,7 @@ namespace CocktailMagician.Domain.Services
         {
             var topRatedBars = await this.context.Bars
                 .OrderByDescending(x => x.Rating)
+                .Where(x => x.IsHidden == false)
                 .Take(3)
                 .Select(x => x.ToContract())
                 .ToListAsync();
