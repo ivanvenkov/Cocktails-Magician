@@ -585,6 +585,8 @@ namespace CocktailMagician.Data.Migrations
 
                     b.Property<int>("TimesUsed");
 
+                    b.Property<int>("TimesUsed");
+
                     b.HasKey("Id");
 
                     b.ToTable("Ingredients");
