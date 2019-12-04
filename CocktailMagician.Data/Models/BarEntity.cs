@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace CocktailMagician.Data.Models
 {
@@ -13,7 +11,7 @@ namespace CocktailMagician.Data.Models
         [StringLength(70, MinimumLength = 3)]
         public string Name { get; set; }
         [Required]
-        [StringLength(120)]
+        [StringLength(220)]
         public string Address { get; set; }
         public double? Rating { get; set; }
         [Required]
@@ -21,6 +19,5 @@ namespace CocktailMagician.Data.Models
         public string ImagePath { get; set; }
         public IEnumerable <BarCocktailEntity> BarCocktails { get; set; }
         public IEnumerable<BarReviewEntity> BarReviews { get; set; }
-
     }
 }

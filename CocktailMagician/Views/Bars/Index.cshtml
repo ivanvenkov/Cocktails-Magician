@@ -1,38 +1,106 @@
-﻿@model IEnumerable<CocktailMagician.Contracts.Bar>
+﻿@model IEnumerable<Bar>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Bars";
 }
+<div class="container">
+    <h1>Bars</h1>
+    <div class="container">
+        @if (User.IsInRole("Admin"))
+        {
+            @Html.ActionLink("New Bar", "Create", "Bars", null, new { @class = "btn btn-primary" })
+        }
 
-<h1>Bars</h1>
-@Html.ActionLink("New Bar", "Create", "Bars", null, new { @class = "btn btn-primary" })
+        @Html.ActionLink("Search", "Search", "Bars", null, new { @class = "btn btn-primary" })
+    </div>
+</div>
+
+<br>
 @if (!Model.Any())
 {
     <p>We don't have any bars yet.</p>
 }
-else
-{
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Address</th>
-                <th>Rating</th>
-                <th>Is Hidden</th>
-                <th>Edit</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var bar in Model)
-            {
-            <tr>
-                <td>@Html.ActionLink(bar.Name, "Details", "Bars", new { id = bar.Id }, null)</td>
-                <td>@bar.Address</td>
-                <td>@bar.Rating</td>
-                <td><a asp-controller="Bars" asp-action="Toggle" asp-route-Id="@bar.Id" button type="submit" method="post" class="btn btn-primary">Hide/Show</a></td>
-                <td><a asp-controller="Bars" asp-action="Edit" asp-route-Id="@bar.Id" button type="submit" method="post" class="btn btn-primary">Edit</a></td>
-            </tr>
-            }
-        </tbody>
-    </table>
 
-}
+<div class="row">
+    @foreach (var bar in Model)
+    {
+
+        <partial name="_BarPartial" model="@bar" />
+
+    }
+
+    <div class="container">
+        <br>
+        @if (ViewBag.Page > 0)
+        {
+            <a asp-controller="Bars" asp-action="Index" asp-route-id="@(ViewBag.Page-1)"
+               class="btn btn-primary">
+                &laquo; Prev
+            </a>
+            <a asp-controller="Bars" asp-action="Index" asp-route-id="@(ViewBag.Page-1)"
+               class="btn btn-light">
+                @(ViewBag.Page)
+            </a>
+        }
+        <a asp-controller="Bars" asp-action="Index" asp-route-id="@(ViewBag.Page)"
+           class="btn btn-primary">
+            @(ViewBag.Page + 1)
+        </a>
+        @if (ViewBag.Page < ViewBag.MaxPage)
+        {
+            <a asp-controller="Bars" asp-action="Index" asp-route-id="@(ViewBag.Page+1)"
+               class="btn btn-light">
+                @(ViewBag.Page + 2)
+            </a>
+            <a asp-controller="Bars" asp-action="Index" asp-route-id="@(ViewBag.Page + 1)"
+               class="btn btn-primary">
+                Next &raquo;
+            </a>
+        }
+
+    </div>
+</div>
+
+<br />
+
+<script>
+
+    const bars = $('.bar-container');
+    foreach(bar in bars);
+    {
+        const starsTotal = 5;
+
+        const barId = bar.attr('id');
+        const barRating = bar.attr('rating');
+
+        const starPercentage = (barRating / starsTotal) * 100;
+        //round to nearest 10
+        const starPercentageRounded = `${Math.round(starPercentage / 10) * 10}%`;
+
+        const pesho = document.querySelector(` .stars-inner`).style.width = starPercentageRounded // the stuff you calculated
+
+
+    }
+</script>
+
+
+
+@*-- partial
+    <div>
+        <div class="bar-container" id="@Model.id" raiting="@Model.raiting">
+        </div>
+    </div>
+
+    <script>
+        const bars = $(.bar - container`);
+        foreach (bar in bars) {
+            const barId = bar.attr('id');
+            const barRaiting = bar.attr('raiting'); //maybe it should have val() ?
+            ... calcution
+            const classToAjustWidth = $(`${ barId }.star - rating`).width = // the stuff you calculated
+        }*@
+
+
+
+
+
+

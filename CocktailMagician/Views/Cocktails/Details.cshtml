@@ -1,14 +1,66 @@
-﻿@model CocktailMagician.Contracts.Cocktail
+﻿@model CocktailDetailsViewModel
 @{
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<div class="container">
+    <div class="col-md-6">
 
-<ul>
-    <li>Bar Name: @Model.Name</li>
-    <li>Bar Address: @Model.Recipe</li>
-    <li>Rating: @Model.Rating</li>
-</ul>
-<h6><strong>Ingredients:</strong></h6> @string.Join(", ", Model.Ingredients.Select(x => x.Name))
+        <div class="img-thumbnail">
+            <div class="figure-caption">
+                <h3 class="pull-right">@Model.Cocktail.Rating</h3>
+                <h3>
+                    <a href="#">@Model.Cocktail.Name</a>
+                </h3>
+            </div>
+            @if (Model.Cocktail.ImagePath != null)
+            {
+                <img alt="@Model.Cocktail.Name" src="@Model.Cocktail.ImagePath" width="100%">
+            }
+            else
+            {
+                <img class="card-img-top image-bar-index" src="~/images/noPhotoAvailable.jpg" alt="Card image cap">
+            }
+        </div>
 
+        <ul>
+            <h5>
+                <br><strong>Recipe: </strong>@Model.Cocktail.Recipe</br>
+                <br><strong>Ingredients:</strong>
+                @string.Join(", ", Model.Cocktail.Ingredients.Select(x => x.Name))
+            </h5>
+        </ul>
+        <p>
+            <div class="container">
+                <a asp-controller="Cocktails" asp-action="Review" asp-route-Id="@Model.Cocktail.Id" button type="submit" method="post" class="btn btn-primary">Review</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Cocktails" asp-action="Edit" asp-route-Id="@Model.Cocktail.Id" button type="submit" method="post" class="btn btn-primary">Edit</a>
+
+                    @if (Model.Cocktail.IsHidden == false)
+                    {
+                        <a asp-controller="Cocktails" asp-action="Toggle" class="btn btn-danger" asp-route-Id="@Model.Cocktail.Id">Hide</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Cocktails" asp-action="Toggle" class="btn btn-success" asp-route-Id="@Model.Cocktail.Id">Show</a>
+                    }
+                }
+            </div>
+            <br />
+            @if (Model.CocktailReviews.Count() != 0)
+            {
+                <div class="container">
+                    <div class="pull-right">
+                        <h6><strong>Comments: </strong></h6>
+                        @foreach (var review in Model.CocktailReviews)
+                        {
+                            <partial name="_CocktailReviewPartial" model="@review" />
+                            <br />
+                        }
+                    </div>
+                </div>
+            }
+        </p>
+    </div>
+</div>

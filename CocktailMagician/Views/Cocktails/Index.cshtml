@@ -1,38 +1,64 @@
-﻿@model IEnumerable<CocktailMagician.Contracts.Cocktail>
+﻿@model IEnumerable<Cocktail>
 @{
     ViewData["Title"] = "Index";
 }
 
 <h1>Cocktails</h1>
-@Html.ActionLink("New Cocktail", "Create", "Cocktails", null, new { @class = "btn btn-primary" })
+
+<div class="col-md-4">
+    <p>
+        @Html.ActionLink("Search", "Search", "Cocktails", null, new { @class = "btn btn-primary" })
+
+        @if ((User.IsInRole("Admin")))
+        {
+
+            @Html.ActionLink("New Cocktail", "Create", "Cocktails", null, new { @class = "btn btn-primary" })
+            <div class="row"></div>
+            @Html.ActionLink("Ingredients", "Index", "Ingredients", null, new { @class = "btn btn-primary" })
+        }
+    </p>
+    <br />
+</div>
+
+<br />
 @if (!Model.Any())
 {
     <p>We don't have any cocktails yet.</p>
 }
-else
-{
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Recipe</th>
-                <th>Rating</th>
-                <th>Is Hidden</th>
-                <th>Edit</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var cocktail in Model)
-            {
-            <tr>
-                <td>@Html.ActionLink(cocktail.Name, "Details", "Cocktails", new { id = cocktail.Id }, null)</td>
-                <td>@cocktail.Recipe</td>
-                <td>@cocktail.Rating</td>
-                <td><a asp-controller="Cocktails" asp-action="Toggle" asp-route-Id="@cocktail.Id" button type="submit" method="post" class="btn btn-primary">Hide/Show</a></td>
-                <td><a asp-controller="Cocktails" asp-action="Edit" asp-route-Id="@cocktail.Id" button type="submit" method="post" class="btn btn-primary">Edit</a></td>
+<div class="row">
+    @foreach (var cocktail in Model)
+    {
+        <partial name="_CocktailPartial" model="@cocktail" />
+    }
+</div>
 
-            </tr>
-            }
-        </tbody>
-    </table>
-}
+
+<div class="container">
+    <br>
+    @if (ViewBag.Page > 0)
+    {
+        <a asp-controller="Cocktails" asp-action="Index" asp-route-id="@(ViewBag.Page-1)"
+           class="btn btn-primary">
+            &laquo; Prev
+        </a>
+        <a asp-controller="Cocktails" asp-action="Index" asp-route-id="@(ViewBag.Page-1)"
+           class="btn btn-light">
+            @(ViewBag.Page)
+        </a>
+    }
+    <a asp-controller="Cocktails" asp-action="Index" asp-route-id="@(ViewBag.Page)"
+       class="btn btn-primary">
+        @(ViewBag.Page + 1)
+    </a>
+    @if (ViewBag.Page < ViewBag.MaxPage)
+    {
+        <a asp-controller="Cocktails" asp-action="Index" asp-route-id="@(ViewBag.Page+1)"
+           class="btn btn-light">
+            @(ViewBag.Page + 2)
+        </a>
+        <a asp-controller="Cocktails" asp-action="Index" asp-route-id="@(ViewBag.Page + 1)"
+           class="btn btn-primary">
+            Next &raquo;
+        </a>
+    }
+</div>

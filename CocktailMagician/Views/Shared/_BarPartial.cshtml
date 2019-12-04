@@ -1,0 +1,108 @@
+﻿@model Bar
+<style>
+    .center {
+        text-align: center;
+    }
+</style>
+
+<style>
+    #RatingsTable {
+        background: transparent;
+        background-color: #D8F0DA
+    }
+</style>
+
+
+<style>
+    .stars-outer {
+        position: relative;
+        display: inline-block;
+    }
+
+    .stars-inner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 0;
+    }
+
+    .stars-outer::before {
+        content: "\f005\f005\f005\f005\f005";
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: #ccc;
+    }
+
+    .stars-inner::before {
+        content: "\f005\f005\f005\f005\f005";
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: #f8ce0b;
+    }
+</style>
+
+<div class="col-md-4 col-lg-4 col-md-4" align="center">
+
+    <div class="margin-bar-card shadow">
+        <p>
+            <a asp-controller="Bars" asp-action="Details" asp-route-id="@Model.Id"> <h5 class="card-title">@Model.Name</h5></a>
+        </p>
+
+        @if (Model.ImagePath != null)
+        {
+            <a asp-controller="Bars" asp-action="Details" asp-route-id="@Model.Id"> <h5 class="card-title">  <img class="card-img-top image-bar-index" src="@Model.ImagePath" alt="Card image cap"></h5></a>
+        }
+        else
+        {
+            <img class="card-img-top image-bar-index" src="~/images/noPhotoAvailable.jpg" alt="Card image cap">
+        }
+
+        <div class="card-body">        
+            <p>
+                Address: @Model.Address
+            </p>
+            <div class="container">
+                <div class="table table-striped">
+                    <div class="center">
+                        @if (Model.Rating != null)
+                        {
+                            <h5> Rating: @Model.Rating </h5>
+                        }
+                        else
+                        {
+                            <h5>  Not rated yet </h5>
+                        }
+                    </div>
+                    @*<div>
+                        <div class="@Model.Name" style="background-color:rgba(0, 0, 0, 0);">
+                            <div class="center">
+                                <div class="stars-outer">
+                                    <div class="stars-inner"></div>
+                                    <span class="number-rating"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>*@
+                </div>
+            </div>
+            <p>
+                <a asp-controller="Bars" asp-action="Review" asp-route-Id="@Model.Id" button type="submit" method="post" class="btn btn-primary">Review</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Bars" asp-action="Edit" asp-route-Id="@Model.Id" button type="submit" method="post" class="btn btn-primary">Edit</a>
+
+                    @if (Model.IsHidden == false)
+                    {
+                        <a asp-controller="Bars" asp-action="Toggle" class="btn btn-danger" asp-route-Id="@Model.Id">Hide</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Bars" asp-action="Toggle" class="btn btn-success" asp-route-Id="@Model.Id">Show</a>
+                    }
+                }
+            </p>
+        </div>
+    </div>
+</div>

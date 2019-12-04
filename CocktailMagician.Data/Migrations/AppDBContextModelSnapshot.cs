@@ -142,7 +142,7 @@ namespace CocktailMagician.Data.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(120);
+                        .HasMaxLength(220);
 
                     b.Property<string>("ImagePath");
 
@@ -163,6 +163,7 @@ namespace CocktailMagician.Data.Migrations
                         {
                             Id = 1,
                             Address = "3483  Stratford Court, Fayetteville, North Carolina",
+                            ImagePath = "/images/bars/bar1.jpg",
                             IsHidden = false,
                             Name = "Ace of Clubs",
                             Rating = 4.5
@@ -171,6 +172,7 @@ namespace CocktailMagician.Data.Migrations
                         {
                             Id = 2,
                             Address = "3234  Mesa Drive, Las Vegas, Nevada",
+                            ImagePath = "/images/bars/bar2.jpg",
                             IsHidden = false,
                             Name = "The Back Lane Bar"
                         },
@@ -178,6 +180,7 @@ namespace CocktailMagician.Data.Migrations
                         {
                             Id = 3,
                             Address = "3292  Oak Lane, Jamesport, Missouri",
+                            ImagePath = "/images/bars/bar3.jpg",
                             IsHidden = false,
                             Name = "The Brass Lantern",
                             Rating = 4.0
@@ -186,6 +189,7 @@ namespace CocktailMagician.Data.Migrations
                         {
                             Id = 4,
                             Address = "1957  Braxton Street, Momence, Illinois",
+                            ImagePath = "/images/bars/bar4.jpg",
                             IsHidden = false,
                             Name = "Blue Boar Inn",
                             Rating = 1.0
@@ -194,6 +198,7 @@ namespace CocktailMagician.Data.Migrations
                         {
                             Id = 5,
                             Address = "3710  Hall Valley Drive, Stonewood, West Virginia",
+                            ImagePath = "/images/bars/bar5.jpg",
                             IsHidden = false,
                             Name = "Dexter Lake Club",
                             Rating = 5.0
@@ -202,6 +207,7 @@ namespace CocktailMagician.Data.Migrations
                         {
                             Id = 6,
                             Address = "1313  Jerome Avenue, Harlingen, Texas",
+                            ImagePath = "/images/bars/bar6.jpg",
                             IsHidden = false,
                             Name = "The Lion and Unicorn "
                         });
@@ -217,7 +223,8 @@ namespace CocktailMagician.Data.Migrations
 
                     b.Property<int>("Rating");
 
-                    b.Property<string>("Review");
+                    b.Property<string>("Review")
+                        .HasMaxLength(1000);
 
                     b.Property<string>("UserEntityId")
                         .IsRequired();
@@ -298,7 +305,7 @@ namespace CocktailMagician.Data.Migrations
 
                     b.Property<string>("Recipe")
                         .IsRequired()
-                        .HasMaxLength(700);
+                        .HasMaxLength(1000);
 
                     b.HasKey("Id");
 
@@ -308,6 +315,7 @@ namespace CocktailMagician.Data.Migrations
                         new
                         {
                             Id = 1,
+                            ImagePath = "/images/cocktails/blackRussian.jpg",
                             IsHidden = false,
                             Name = "Black Russian",
                             Rating = 5.0,
@@ -316,6 +324,7 @@ namespace CocktailMagician.Data.Migrations
                         new
                         {
                             Id = 2,
+                            ImagePath = "/images/cocktails/whiskeyAndCoke.jpg",
                             IsHidden = false,
                             Name = "Whiskey And Coke",
                             Rating = 4.0,
@@ -324,6 +333,7 @@ namespace CocktailMagician.Data.Migrations
                         new
                         {
                             Id = 3,
+                            ImagePath = "/images/cocktails/cubaLibre.jpg",
                             IsHidden = false,
                             Name = "Cuba Libre",
                             Rating = 1.0,
@@ -340,6 +350,7 @@ namespace CocktailMagician.Data.Migrations
                         new
                         {
                             Id = 5,
+                            ImagePath = "/images/cocktails/caribbeanSunsetMocktail.jpg",
                             IsHidden = false,
                             Name = "Carribean Sunset Mocktail",
                             Recipe = "No one will miss the alcohol in this tasty family-friendly drink combining Sprite, orange juice, lemonade and grenadine"
@@ -347,6 +358,7 @@ namespace CocktailMagician.Data.Migrations
                         new
                         {
                             Id = 6,
+                            ImagePath = "/images/cocktails/longIslandIcedTea.jpg",
                             IsHidden = false,
                             Name = "Long Island Iced Tea Mocktail",
                             Rating = 4.5,
@@ -355,6 +367,7 @@ namespace CocktailMagician.Data.Migrations
                         new
                         {
                             Id = 7,
+                            ImagePath = "/images/cocktails/cocaColaSpice.jpg",
                             IsHidden = false,
                             Name = "Coca-Cola Spice",
                             Recipe = "Add Coca-Cola, pineapple juice and Pibb Xtra to make a non-alcoholic take on a traditional holiday beverage."
@@ -496,7 +509,8 @@ namespace CocktailMagician.Data.Migrations
 
                     b.Property<int>("Rating");
 
-                    b.Property<string>("Review");
+                    b.Property<string>("Review")
+                        .HasMaxLength(1000);
 
                     b.Property<string>("UserEntityId")
                         .IsRequired();
@@ -565,7 +579,11 @@ namespace CocktailMagician.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(70);
+
+                    b.Property<int>("TimesUsed");
 
                     b.HasKey("Id");
 
@@ -575,92 +593,110 @@ namespace CocktailMagician.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Coca-Cola"
+                            Name = "Coca-Cola",
+                            TimesUsed = 6
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Coffee Liqueur"
+                            Name = "Coffee Liqueur",
+                            TimesUsed = 1
                         },
                         new
                         {
                             Id = 3,
-                            Name = "Lime Juice"
+                            Name = "Lime Juice",
+                            TimesUsed = 1
                         },
                         new
                         {
                             Id = 4,
-                            Name = "Milk"
+                            Name = "Milk",
+                            TimesUsed = 1
                         },
                         new
                         {
                             Id = 5,
-                            Name = "Kahlua"
+                            Name = "Kahlua",
+                            TimesUsed = 1
                         },
                         new
                         {
                             Id = 6,
-                            Name = "White Rum"
+                            Name = "White Rum",
+                            TimesUsed = 1
                         },
                         new
                         {
                             Id = 7,
-                            Name = "Whiskey"
+                            Name = "Whiskey",
+                            TimesUsed = 1
                         },
                         new
                         {
                             Id = 8,
-                            Name = "Vodka"
+                            Name = "Vodka",
+                            TimesUsed = 2
                         },
                         new
                         {
                             Id = 9,
-                            Name = "Sprite"
+                            Name = "Sprite",
+                            TimesUsed = 1
                         },
                         new
                         {
                             Id = 10,
-                            Name = "Orange Juice"
+                            Name = "Orange Juice",
+                            TimesUsed = 1
                         },
                         new
                         {
                             Id = 11,
-                            Name = "Lemonade"
+                            Name = "Lemonade",
+                            TimesUsed = 2
                         },
                         new
                         {
                             Id = 12,
-                            Name = "Grenadine"
+                            Name = "Grenadine",
+                            TimesUsed = 1
                         },
                         new
                         {
                             Id = 13,
-                            Name = "Black Tea"
+                            Name = "Black Tea",
+                            TimesUsed = 1
                         },
                         new
                         {
                             Id = 14,
-                            Name = "Pineapple Juice"
+                            Name = "Pineapple Juice",
+                            TimesUsed = 1
                         },
                         new
                         {
                             Id = 15,
-                            Name = "Pibb Xtra"
+                            Name = "Pibb Xtra",
+                            TimesUsed = 2
                         },
                         new
                         {
                             Id = 16,
-                            Name = "Club Soda"
+                            Name = "Club Soda",
+                            TimesUsed = 1
                         },
                         new
                         {
                             Id = 17,
-                            Name = "Fanta"
+                            Name = "Fanta",
+                            TimesUsed = 0
                         },
                         new
                         {
                             Id = 18,
-                            Name = "Yogurt"
+                            Name = "Yogurt",
+                            TimesUsed = 0
                         });
                 });
 
